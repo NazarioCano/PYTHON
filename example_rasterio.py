@@ -25,13 +25,13 @@ def calc_histograma(datos, bandas):
     return unique, counts
 
 ruta = '/Users/nazariocano/Desktop/2021/12/5'
-raster = load_landsat_image('BO6.TIF')
+#raster = load_landsat_image('2021/12/5/T14QKG/BO1.TIF')
 
 #show_hist(raster.read(1), bins=1000, lw=0.0, stacked=False, alpha=0.3, histtype='stepfilled', title="Histograma")
 
-ds = raster.read(1)
-bandas = raster.count
-valores, frecuencias = calc_histograma(ds, bandas)
+#ds = raster.read(1)
+#bandas = raster.count
+v#alores, frecuencias = calc_histograma(ds, bandas)
 
 
 #np.savetxt('salida.csv', valores, delimiter=',')#Imprimir valores en un rchivo de texto

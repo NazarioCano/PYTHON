@@ -69,5 +69,3 @@ def days(rangos):
     except:
         print('No hay fechas') 
 
-y=months(mes_inicial,mes_final)
-days(y)

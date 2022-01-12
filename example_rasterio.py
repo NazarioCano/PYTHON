@@ -25,7 +25,7 @@ def calc_histograma(datos, bandas):
     return unique, counts
 
 ruta = '/Users/nazariocano/Desktop/2021/12/5'
-raster = load_landsat_image('B03.TIF')
+raster = load_landsat_image('BO6.TIF')
 
 #show_hist(raster.read(1), bins=1000, lw=0.0, stacked=False, alpha=0.3, histtype='stepfilled', title="Histograma")
 

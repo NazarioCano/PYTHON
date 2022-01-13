@@ -1,3 +1,4 @@
+from constants import ALEJANDRO
 from example_rasterio import calc_histograma
 import numpy as np
 import rasterio as rio
@@ -30,7 +31,7 @@ def months(inicial,final):
     ruta = f'/Users/nazariocano/PYTHON/{year_init}/*/'
     fechas = glob.glob(ruta)
     meses=[]
-    
+    #print(fechas)
     try:
         for fecha in fechas:
             mes = int(re.findall('[0-9]+',fecha)[1])#Checar las rutas que contengan numeros
@@ -43,64 +44,64 @@ def months(inicial,final):
         if month_fin in meses:
             indice_fin=meses.index(month_fin)+1
 
-        rango = meses[indice_in:indice_fin]   
-        RES.meses = rango 
-        RES.año = year_init
-        RES.inicio = day_init 
-        return RES
+        rango= meses[indice_in:indice_fin]   
+        return(rango,year_init,day_init,day_fin) 
 
     except:
         print('Error, no se encontraron fechas disponibles')
 
-def days(rango,year,day_init):
-    #print(rango,year,day_init)
-    i=0
+def days(rango,year,day_init,day_fin):
+    i=1
     num_meses=len(rango)
     #print(num_meses)
     try:
         for rang in rango:
-            #print(rang)
-            ruta = f'/Users/nazariocano/PYTHON/{year}/{rang}/*/'
+            #print(i)
+            ruta = f'C:/Users/PC/S10/{year}/{rang}/*/'
             fechas = glob.glob(ruta)
             dias=[]
             aux_dias=[]
-            if  i==0:  
-                i = i + 1
-                #print('Entro al if')                      
+
+            if  i==1:  
+                i=i+ 1
                 for fecha in fechas:
                     dia = int(re.findall('[0-9]+',fecha)[2])#Cambiar con respecto a la ruta
                     dias.append(dia)
                     dias.sort()
                     if day_init in dias:
-                        indice=dias.index(day_init)
-                        #print(indice)
-                x=dias[indice:]
+                        indice_init=dias.index(day_init)
+                x=dias[indice_init:]
                 aux_dias=(x)
-                #dias.sort()
-                #print(aux_dias)
 
-                    #f.update({rang:dias})                
+            elif  i==num_meses:  
+                for fecha in fechas:
+                    dia = int(re.findall('[0-9]+',fecha)[3])
+                    dias.append(dia)
+                    dias.sort()
+                    if day_fin in dias:
+                        indice_fin=dias.index(day_fin)+1
+                z=dias[:indice_fin]
+                aux_dias=(z)
+
             else:
-                #print('Entro al else')
+                i=i+ 1
                 for fecha in fechas:
                     dia = int(re.findall('[0-9]+',fecha)[3])
                     aux_dias.append(dia)
                     aux_dias.sort() 
-                #print(aux_dias)
-
-            #print(aux_dias)
-            return aux_dias;   
-            #print(i)
+            print(aux_dias)
+    
+    
+    
     except:
      print('No hay fechas') 
 
-fecha_inicial = '2021-12-15'
+fecha_inicial = '2021-8-6'
 fecha_final = '2021-12-15'
 
-#y=months(fecha_inicial,fecha_final)
-#d=days(y[0],y[1],y[2])
+y=months(fecha_inicial,fecha_final)
+d=days(y[0],y[1],y[2],y[3])
 
-#print(d)
 ######
 
 def array_raster(ruta, bands, year, mes, dia):

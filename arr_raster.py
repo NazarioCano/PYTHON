@@ -15,20 +15,23 @@ from pathlib import Path
 
 
 
-def load_landsat_image(ruta, bands, year, mes, dia):
+def array_raster(ruta, bands, year, mes, dia):
     image = {}
     path = Path(ruta)
-    for band in bands:
-        file = Path(path,f'{year}/{mes}/{dia}/T14QKG/{band}.TIF')
-        print(f'Opening file {file}')
-        ds = rio.open(file)
-        #image.update({band: ds.read(1)})
-    return image
+    try:
+        for band in bands:
+            file = Path(path,f'{year}/{mes}/{dia}/T14QKG/{band}.TIF')
+            print(f'Opening file {file}')
+            ds = rio.open(file)
+            image.update({band: ds.read(1)})
+        return image
+    except:
+        print('No se encontraron acrchivos')
 
-ruta = '/Users/nazariocano/Desktop/PYTHON'
+ruta = '/Users/nazariocano/PYTHON'
 
-#RES = load_landsat_image(ruta,['BO3'], '2021', '12', '5')
-rio.open('/Users/nazariocano/Desktop/2021/12/5/T14QKG/BO3.TIF')
+RES = array_raster(ruta,['B11'], '2021', '12', '5')
+print(RES['B11'])
 
 mes_inicial=10
 mes_final=12

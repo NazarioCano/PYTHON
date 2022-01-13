@@ -15,7 +15,8 @@ VEGETAL_INDEXES = [
         'NBR', 'CVI', 'GCI'
     ]
 
-ALEJANDRO= 'C:/Users/PC/S10/'
+ALEJ = 'C:/Users/PC/S10/'
+NAZ = '/Users/nazariocano/PYTHON/'
 
 
 

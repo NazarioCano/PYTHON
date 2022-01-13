@@ -1,4 +1,4 @@
-from constants import ALEJANDRO
+from constants import ALEJ, NAZ
 from example_rasterio import calc_histograma
 import numpy as np
 import rasterio as rio
@@ -28,6 +28,7 @@ def months(inicial,final):
     month_fin=int(fecha_fin[1])
     day_fin=int(fecha_fin[2])
 
+    
     ruta = f'/Users/nazariocano/PYTHON/{year_init}/*/'
     fechas = glob.glob(ruta)
     meses=[]
@@ -57,7 +58,7 @@ def days(rango,year,day_init,day_fin):
     try:
         for rang in rango:
             #print(i)
-            ruta = f'C:/Users/PC/S10/{year}/{rang}/*/'
+            ruta = f'{NAZ}/{year}/{rang}/*/'
             fechas = glob.glob(ruta)
             dias=[]
             aux_dias=[]
@@ -127,7 +128,7 @@ def salida(FECHA_INICIAL, FECHA_FINAL):
 
 RES = salida(fecha_inicial, fecha_final)
 
-ruta = '/Users/nazariocano/PYTHON'
+ruta = NAZ
 
 #RES = array_raster(ruta,['B11'], '2021', '12', '5')
 #print(type(RES['B11']))

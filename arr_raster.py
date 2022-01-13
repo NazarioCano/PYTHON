@@ -22,6 +22,32 @@ def months(inicial,final):
     month_fin=int(fecha_fin[1])
     day_fin=int(fecha_fin[2])
 
+
+
+
+
+def array_raster(ruta, bands, year, mes, dia):
+    image = {}
+    path = Path(ruta)
+    try:
+        for band in bands:
+            file = Path(path,f'{year}/{mes}/{dia}/T14QKG/{band}.TIF')
+            print(f'Opening file {file}')
+            ds = rio.open(file)
+            image.update({band: ds.read(1)})
+        return image
+    except:
+        print('No se encontraron acrchivos')
+
+ruta = '/Users/nazariocano/PYTHON'
+
+RES = array_raster(ruta,['B11'], '2021', '12', '5')
+print(RES['B11'])
+
+mes_inicial=10
+mes_final=12
+
+def months(inicial,final):
     ruta = f'C:/Users/PC/S10/{year_init}/*/'
     fechas = glob.glob(ruta)
     meses=[]

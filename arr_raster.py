@@ -1,10 +1,10 @@
+from example_rasterio import calc_histograma
 import numpy as np
 import rasterio as rio
 import glob
 import re
 from rasterio.plot import show_hist, show
 from rasterio.mask import mask
-from constants import ALEJANDRO, BANDS, PRODUCTS
 from matplotlib import pyplot as plt
 from pathlib import Path
 
@@ -22,32 +22,6 @@ def months(inicial,final):
     month_fin=int(fecha_fin[1])
     day_fin=int(fecha_fin[2])
 
-
-
-
-
-def array_raster(ruta, bands, year, mes, dia):
-    image = {}
-    path = Path(ruta)
-    try:
-        for band in bands:
-            file = Path(path,f'{year}/{mes}/{dia}/T14QKG/{band}.TIF')
-            print(f'Opening file {file}')
-            ds = rio.open(file)
-            image.update({band: ds.read(1)})
-        return image
-    except:
-        print('No se encontraron acrchivos')
-
-ruta = '/Users/nazariocano/PYTHON'
-
-RES = array_raster(ruta,['B11'], '2021', '12', '5')
-print(RES['B11'])
-
-mes_inicial=10
-mes_final=12
-
-def months(inicial,final):
     ruta = f'C:/Users/PC/S10/{year_init}/*/'
     fechas = glob.glob(ruta)
     meses=[]
@@ -113,34 +87,30 @@ def days(rango,year,day_init):
     except:
      print('No hay fechas') 
 
-
-mes_inicial=12
-mes_final=12
-fecha_inicial='2021-5-15'
-fecha_final='2021-9-1'
-
-
+fecha_inicial = '2021-5-15'
+fecha_final = '2021-9-1'
 
 y=months(fecha_inicial,fecha_final)
 d=days(y[0],y[1],y[2])
 print(d)
 ######
-"""
-dia=days(months(mes_inicial,mes_final))
-year=2021
-mes=12
-path=ALEJANDRO
-banda=['B03']
-"""
 
-def load_landsat_image(ruta, bands, year, mes, dia):
+def array_raster(ruta, bands, year, mes, dia):
     image = {}
     path = Path(ruta)
-    for band in bands:
-        file = Path(path,f'{year}/{mes}/{dia}/T14QKG/{band}.TIF')
- #       print(f'Opening file {file}')
-        ds = rio.open(file)
-        image.update({band: ds.read(1)})
-    return image
-#RES=load_landsat_image(path,['B03','B05'],'2021','12','5')
-#print(RES)
+    try:
+        for band in bands:
+            file = Path(path,f'{year}/{mes}/{dia}/T14QKG/{band}.TIF')
+            print(f'Opening file {file}')
+            ds = rio.open(file)
+            image.update({band: ds.read(1).astype(np.float32)})
+        return image
+    except:
+        print('No se encontraron acrchivos')
+
+ruta = '/Users/nazariocano/PYTHON'
+
+RES = array_raster(ruta,['B11'], '2021', '12', '5')
+print(type(RES['B11']))
+print(RES.shape)
+calc_histograma(RES['B11'],1)

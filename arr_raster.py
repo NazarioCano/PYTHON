@@ -4,33 +4,18 @@ import glob
 import re
 from rasterio.plot import show_hist, show
 from rasterio.mask import mask
-from constants import BANDS, PRODUCTS
+from constants import ALEJANDRO, BANDS, PRODUCTS
 from matplotlib import pyplot as plt
 from pathlib import Path
 
 
 
-
-
-
-
-
-def load_landsat_image(ruta, bands, year, mes, dia):
-    image = {}
-    path = Path(ruta)
-    for band in bands:
-        file = Path(path,f'{year}/{mes}/{dia}/T14QKG/{band}.TIF')
-        print(f'Opening file {file}')
-        ds = rio.open(file)
-        #image.update({band: ds.read(1)})
-    return image
-
-ruta = '/Users/nazariocano/Desktop/PYTHON'
+#ruta = '/Users/nazariocano/Desktop/PYTHON'
 
 #RES = load_landsat_image(ruta,['BO3'], '2021', '12', '5')
-rio.open('/Users/nazariocano/Desktop/2021/12/5/T14QKG/BO3.TIF')
 
-mes_inicial=10
+
+mes_inicial=12
 mes_final=12
 
 def months(inicial,final):
@@ -42,7 +27,6 @@ def months(inicial,final):
             mes = int(re.findall('[0-9]+',fecha)[2])
             meses.append(mes)
             meses.sort()
-            #print(mes)
 
         if inicial in meses:
             indice_in=meses.index(inicial)
@@ -69,5 +53,26 @@ def days(rangos):
     except:
         print('No hay fechas') 
 
-y=months(mes_inicial,mes_final)
-days(y)
+#y=months(mes_inicial,mes_final)
+#days(y)
+
+
+######
+"""
+dia=days(months(mes_inicial,mes_final))
+year=2021
+mes=12
+path=ALEJANDRO
+banda=['B03']
+"""
+def load_landsat_image(ruta, bands, year, mes, dia):
+    image = {}
+    path = Path(ruta)
+    for band in bands:
+        file = Path(path,f'{year}/{mes}/{dia}/T14QKG/{band}.TIF')
+ #       print(f'Opening file {file}')
+        ds = rio.open(file)
+        image.update({band: ds.read(1)})
+    return image
+#RES=load_landsat_image(path,['B03','B05'],'2021','12','5')
+#print(RES)

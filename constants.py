@@ -15,7 +15,7 @@ VEGETAL_INDEXES = [
         'NBR', 'CVI', 'GCI'
     ]
 
-
+ALEJANDRO= 'C:/Users/PC/S10/'
 
 
 

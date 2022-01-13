@@ -12,6 +12,11 @@ from pathlib import Path
 #RES = load_landsat_image(ruta,['BO3'], '2021', '12', '5')
 
 def months(inicial,final):
+    class RES : 
+        meses = tuple
+        año = ''
+        inicio = ''
+    
     fecha_init=re.findall('([A-Z0-9]{1,4})',inicial)
     year_init=int(fecha_init[0])
     month_init=int(fecha_init[1])
@@ -22,14 +27,14 @@ def months(inicial,final):
     month_fin=int(fecha_fin[1])
     day_fin=int(fecha_fin[2])
 
-    ruta = f'C:/Users/PC/S10/{year_init}/*/'
+    ruta = f'/Users/nazariocano/PYTHON/{year_init}/*/'
     fechas = glob.glob(ruta)
     meses=[]
     
     try:
         for fecha in fechas:
-            mes = int(re.findall('[0-9]+',fecha)[2])
-            meses.append(mes)
+            mes = int(re.findall('[0-9]+',fecha)[1])#Checar las rutas que contengan numeros
+            meses.append(mes)  #Se agregan los meses
             meses.sort()
 
         if month_init in meses:
@@ -38,8 +43,11 @@ def months(inicial,final):
         if month_fin in meses:
             indice_fin=meses.index(month_fin)+1
 
-        rango= meses[indice_in:indice_fin]   
-        return(rango,year_init,day_init) 
+        rango = meses[indice_in:indice_fin]   
+        RES.meses = rango 
+        RES.año = year_init
+        RES.inicio = day_init 
+        return RES
 
     except:
         print('Error, no se encontraron fechas disponibles')
@@ -52,15 +60,15 @@ def days(rango,year,day_init):
     try:
         for rang in rango:
             #print(rang)
-            ruta = f'C:/Users/PC/S10/{year}/{rang}/*/'
+            ruta = f'/Users/nazariocano/PYTHON/{year}/{rang}/*/'
             fechas = glob.glob(ruta)
             dias=[]
             aux_dias=[]
             if  i==0:  
-                i=i+ 1
+                i = i + 1
                 #print('Entro al if')                      
                 for fecha in fechas:
-                    dia = int(re.findall('[0-9]+',fecha)[3])
+                    dia = int(re.findall('[0-9]+',fecha)[2])#Cambiar con respecto a la ruta
                     dias.append(dia)
                     dias.sort()
                     if day_init in dias:
@@ -80,19 +88,19 @@ def days(rango,year,day_init):
                     aux_dias.sort() 
                 #print(aux_dias)
 
-            print(aux_dias)
-
-            
+            #print(aux_dias)
+            return aux_dias;   
             #print(i)
     except:
      print('No hay fechas') 
 
-fecha_inicial = '2021-5-15'
-fecha_final = '2021-9-1'
+fecha_inicial = '2021-12-15'
+fecha_final = '2021-12-15'
 
-y=months(fecha_inicial,fecha_final)
-d=days(y[0],y[1],y[2])
-print(d)
+#y=months(fecha_inicial,fecha_final)
+#d=days(y[0],y[1],y[2])
+
+#print(d)
 ######
 
 def array_raster(ruta, bands, year, mes, dia):
@@ -108,9 +116,19 @@ def array_raster(ruta, bands, year, mes, dia):
     except:
         print('No se encontraron acrchivos')
 
+
+def salida(FECHA_INICIAL, FECHA_FINAL):
+    fecha_I = FECHA_INICIAL
+    fecha_F = FECHA_FINAL
+    MESES = months(fecha_I, fecha_F)
+    d = days(MESES.meses, MESES.año, MESES.inicio)
+    print('Dias ',d)
+
+RES = salida(fecha_inicial, fecha_final)
+
 ruta = '/Users/nazariocano/PYTHON'
 
-RES = array_raster(ruta,['B11'], '2021', '12', '5')
-print(type(RES['B11']))
-print(RES.shape)
-calc_histograma(RES['B11'],1)
+#RES = array_raster(ruta,['B11'], '2021', '12', '5')
+#print(type(RES['B11']))
+#print(RES.shape)
+#calc_histograma(RES['B11'],1)

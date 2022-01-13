@@ -1,17 +1,12 @@
+from example_rasterio import calc_histograma
 import numpy as np
 import rasterio as rio
 import glob
 import re
 from rasterio.plot import show_hist, show
 from rasterio.mask import mask
-from constants import BANDS, PRODUCTS
 from matplotlib import pyplot as plt
 from pathlib import Path
-
-
-
-
-
 
 
 
@@ -23,7 +18,7 @@ def array_raster(ruta, bands, year, mes, dia):
             file = Path(path,f'{year}/{mes}/{dia}/T14QKG/{band}.TIF')
             print(f'Opening file {file}')
             ds = rio.open(file)
-            image.update({band: ds.read(1)})
+            image.update({band: ds.read(1).astype(np.float32)})
         return image
     except:
         print('No se encontraron acrchivos')
@@ -31,10 +26,10 @@ def array_raster(ruta, bands, year, mes, dia):
 ruta = '/Users/nazariocano/PYTHON'
 
 RES = array_raster(ruta,['B11'], '2021', '12', '5')
-print(RES['B11'])
+print(type(RES['B11']))
+print(RES.shape)
+calc_histograma(RES['B11'],1)
 
-mes_inicial=10
-mes_final=12
 
 def months(inicial,final):
     ruta = 'C:/Users/PC/S10/2021/*/'
@@ -72,3 +67,8 @@ def days(rangos):
     except:
         print('No hay fechas') 
 
+def salidad_res(FECHA_INICIAL, FECHA_FINAL):
+    fecha_I = FECHA_INICIAL
+    fecha_F = FECHA_FINAL
+    meses = months()
+    return 

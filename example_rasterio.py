@@ -13,16 +13,19 @@ def load_landsat_image(file):
 
 def calc_histograma(datos, bandas):
     print('Bandas',bandas)
-    unique, counts = np.unique(datos, return_counts = True)
-    valores = unique
-    frecuencias = counts
-    plt.plot(valores, frecuencias)
-    plt.grid(True)
-    plt.xlabel('Valor')
-    plt.ylabel('Frecuencia')
-    plt.title('Histograma')
-    plt.show()
-    return unique, counts
+    try:
+        unique, counts = np.unique(datos, return_counts = True)
+        valores = unique
+        frecuencias = counts
+        plt.plot(valores, frecuencias)
+        plt.grid(True)
+        plt.xlabel('Valor')
+        plt.ylabel('Frecuencia')
+        plt.title('Histograma')
+        plt.show()
+        return unique, counts
+    except:
+        print('Error en le calculo de histograma')
 
 ruta = '/Users/nazariocano/Desktop/2021/12/5'
 #raster = load_landsat_image('2021/12/5/T14QKG/BO1.TIF')
@@ -31,7 +34,7 @@ ruta = '/Users/nazariocano/Desktop/2021/12/5'
 
 #ds = raster.read(1)
 #bandas = raster.count
-v#alores, frecuencias = calc_histograma(ds, bandas)
+#valores, frecuencias = calc_histograma(ds, bandas)
 
 
 #np.savetxt('salida.csv', valores, delimiter=',')#Imprimir valores en un rchivo de texto

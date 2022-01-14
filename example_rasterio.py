@@ -56,7 +56,7 @@ bandas = raster.count
 valores, frecuencias = calc_histograma(ds, bandas)
 
 
-calc_medias(valores)
+#calc_medias(valores)
 
 
 

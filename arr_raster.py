@@ -1,3 +1,4 @@
+from multiprocessing.dummy import Array
 from constants import ALEJ, NAZ
 from example_rasterio import calc_histograma
 import numpy as np
@@ -13,11 +14,6 @@ from pathlib import Path
 #RES = load_landsat_image(ruta,['BO3'], '2021', '12', '5')
 
 def months(inicial,final):
-    class RES : 
-        meses = tuple
-        año = ''
-        inicio = ''
-    
     fecha_init=re.findall('([A-Z0-9]{1,4})',inicial)
     year_init=int(fecha_init[0])
     month_init=int(fecha_init[1])
@@ -33,7 +29,7 @@ def months(inicial,final):
     meses=[]
     try:
         for fecha in fechas:
-            mes = int(re.findall('[0-9]+',fecha)[2])#Checar las rutas que contengan numeros #alejandro 2 nazario 1
+            mes = int(re.findall('[0-9]+',fecha)[1])#Checar las rutas que contengan numeros #alejandro 2 nazario 1
             meses.append(mes)  #Se agregan los meses
             meses.sort()
         if month_init in meses:
@@ -59,7 +55,7 @@ def days(rango,year,day_init,day_fin):
     try:
         for rang in rango:
             #print(i)
-            ruta = f'{ALEJ}/{year}/{rang}/*/'
+            ruta = f'{NAZ}/{year}/{rang}/*/'
             fechas = glob.glob(ruta)
             dias=[]
             aux_dias=[]
@@ -67,7 +63,7 @@ def days(rango,year,day_init,day_fin):
             if  i==1 and num_meses!=1:  
                 i=i+ 1
                 for fecha in fechas:
-                    dia = int(re.findall('[0-9]+',fecha)[3])#Cambiar con respecto a la ruta #alejandro 3 nazario 2
+                    dia = int(re.findall('[0-9]+',fecha)[2])#Cambiar con respecto a la ruta #alejandro 3 nazario 2
                     dias.append(dia)
                     dias.sort()
                     if day_init in dias:
@@ -95,56 +91,67 @@ def days(rango,year,day_init,day_fin):
                 aux_dias=(z)
                 days.append(aux_dias)
                 RES.update({rang:aux_dias})
-                #print(days)
 
             else:
                 i=i+ 1
                 for fecha in fechas:
-                    dia = int(re.findall('[0-9]+',fecha)[3])#alejandro 3 nazario 2
+                    dia = int(re.findall('[0-9]+',fecha)[2])#alejandro 3 nazario 2
                     aux_dias.append(dia)
                     aux_dias.sort() 
                 days.append(aux_dias)
             RES.update({rang:aux_dias})
 
-        return days,RES
+        return RES
     
             
     except:
      print('No hay fechas') 
 
 #fecha_inicial = '2021-8-6'
-fecha_inicial = '2021-8-29'
-fecha_final = '2021-10-8'
+fecha_inicial = '2021-11-5'
+fecha_final = '2021-12-30'
 
-y=months(fecha_inicial,fecha_final)
-d, RES=days(y[0],y[1],y[2],y[3])
-print(RES)
-######
+#y = months(fecha_inicial,fecha_final)
+#d, RES = days(y[0],y[1],y[2],y[3])
 
-def array_raster(ruta, bands, year, mes, dia):
+
+
+def array_raster(ruta, filtro, year, mes, dias):
     image = {}
     path = Path(ruta)
     try:
-        for band in bands:
-            file = Path(path,f'{year}/{mes}/{dia}/T14QKG/{band}.TIF')
+        for dia in dias:
+            file = Path(path,f'{year}/{mes}/{dia}/T14QKG/{filtro}.TIF')
             print(f'Opening file {file}')
             ds = rio.open(file)
-            image.update({band: ds.read(1).astype(np.float32)})
+            image.update({dia: ds.read(1).astype(np.float32)})
         return image
     except:
         print('No se encontraron acrchivos')
 
 
 def salida(FECHA_INICIAL, FECHA_FINAL):
+    ruta = NAZ
     fecha_I = FECHA_INICIAL
     fecha_F = FECHA_FINAL
-    MESES = months(fecha_I, fecha_F)
-    d = days(MESES.meses, MESES.año, MESES.inicio)
-   # print('Dias ',d)
+    try: 
+        meses = months(fecha_I, fecha_F)
+        for mes in meses[0]:
+            d = days(meses[0],meses[1],meses[2],meses[3])
+            print('Ruta:', ruta)
+            print('Filtro: B01',  )
+            print('Año:', meses[1])
+            print('Mes', mes)
+            print('Dias', d[mes])
+            ArrayR = array_raster(ruta, 'B01',meses[1],mes,d[mes])
+    except:
+        print('No se cargaron los archivos')
 
-#RES = salida(fecha_inicial, fecha_final)
 
-ruta = NAZ
+
+
+RES = salida(fecha_inicial, fecha_final)
+
 
 #RES = array_raster(ruta,['B11'], '2021', '12', '5')
 #print(type(RES['B11']))

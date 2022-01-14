@@ -31,76 +31,94 @@ def months(inicial,final):
     ruta = f'{NAZ}/{year_init}/*/'
     fechas = glob.glob(ruta)
     meses=[]
-    #print(fechas)
     try:
         for fecha in fechas:
-            mes = int(re.findall('[0-9]+',fecha)[1])#Checar las rutas que contengan numeros
+            mes = int(re.findall('[0-9]+',fecha)[2])#Checar las rutas que contengan numeros #alejandro 2 nazario 1
             meses.append(mes)  #Se agregan los meses
             meses.sort()
-
         if month_init in meses:
             indice_in=meses.index(month_init)
 
         if month_fin in meses:
             indice_fin=meses.index(month_fin)+1
 
-        rango= meses[indice_in:indice_fin]   
+        rango= meses[indice_in:indice_fin]
         return(rango,year_init,day_init,day_fin) 
 
     except:
         print('Error, no se encontraron fechas disponibles')
 
 def days(rango,year,day_init,day_fin):
+    RES = {}
+    days=[]
     i=1
     num_meses=len(rango)
+    meses=rango
+    #print(meses)
     #print(num_meses)
     try:
         for rang in rango:
             #print(i)
-            ruta = f'{NAZ}/{year}/{rang}/*/'
+            ruta = f'{ALEJ}/{year}/{rang}/*/'
             fechas = glob.glob(ruta)
             dias=[]
             aux_dias=[]
 
-            if  i==1:  
+            if  i==1 and num_meses!=1:  
                 i=i+ 1
                 for fecha in fechas:
-                    dia = int(re.findall('[0-9]+',fecha)[2])#Cambiar con respecto a la ruta
+                    dia = int(re.findall('[0-9]+',fecha)[3])#Cambiar con respecto a la ruta #alejandro 3 nazario 2
                     dias.append(dia)
                     dias.sort()
                     if day_init in dias:
                         indice_init=dias.index(day_init)
                 x=dias[indice_init:]
                 aux_dias=(x)
+                days.append(aux_dias)
+                RES.update({rang:aux_dias})
 
             elif  i==num_meses:  
                 for fecha in fechas:
                     dia = int(re.findall('[0-9]+',fecha)[2])
                     dias.append(dia)
                     dias.sort()
+
+                    if day_init in dias and i==num_meses:
+                        indice_init=dias.index(day_init)
+                    else:
+                        indice_init=0
+
                     if day_fin in dias:
                         indice_fin=dias.index(day_fin)+1
-                z=dias[:indice_fin]
+
+                z=dias[indice_init:indice_fin]
                 aux_dias=(z)
+                days.append(aux_dias)
+                RES.update({rang:aux_dias})
+                #print(days)
 
             else:
                 i=i+ 1
                 for fecha in fechas:
-                    dia = int(re.findall('[0-9]+',fecha)[2])
+                    dia = int(re.findall('[0-9]+',fecha)[3])#alejandro 3 nazario 2
                     aux_dias.append(dia)
                     aux_dias.sort() 
-                    print(aux_dias)
-            return aux_dias
+                days.append(aux_dias)
+            RES.update({rang:aux_dias})
+
+        return days,RES
+    
+            
     except:
      print('No hay fechas') 
 
-fecha_inicial = '2021-12-15'
-fecha_final = '2021-12-15'
+#fecha_inicial = '2021-8-6'
+fecha_inicial = '2021-8-29'
+fecha_final = '2021-10-8'
 
-#y=months(fecha_inicial,fecha_final)
-#d=days(y[0],y[1],y[2],y[3])
-#print('Dias', d)
-
+y=months(fecha_inicial,fecha_final)
+d, RES=days(y[0],y[1],y[2],y[3])
+print(RES)
 ######
 
 def array_raster(ruta, bands, year, mes, dia):
@@ -120,12 +138,11 @@ def array_raster(ruta, bands, year, mes, dia):
 def salida(FECHA_INICIAL, FECHA_FINAL):
     fecha_I = FECHA_INICIAL
     fecha_F = FECHA_FINAL
-    RES = months(fecha_I, fecha_F)
-    for mes in RES:
-        d = days(mes, RES[1], RES[2], RES[3])
-        print('Dias ',d)
+    MESES = months(fecha_I, fecha_F)
+    d = days(MESES.meses, MESES.año, MESES.inicio)
+   # print('Dias ',d)
 
-RES = salida(fecha_inicial, fecha_final)
+#RES = salida(fecha_inicial, fecha_final)
 
 ruta = NAZ
 
@@ -133,3 +150,5 @@ ruta = NAZ
 #print(type(RES['B11']))
 #print(RES.shape)
 #calc_histograma(RES['B11'],1)
+
+

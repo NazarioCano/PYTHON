@@ -4,31 +4,75 @@ from rasterio.plot import show_hist, show
 from rasterio.mask import mask
 from matplotlib import pyplot as plt
 import statistics as stats
-from pyproj import Transformer, pyproj
+from pyproj import Transformer
 from shapely.ops import transform
+from shapely.geometry import Polygon
+from rasterio.warp import calculate_default_transform, reproject, Resampling, Affine
 
 
 
+
+def parseStringToPolygon(string):
+    coordinates = [(float(item.split('/')[1]), float(item.split('/')[0])) for item in string[:-1].split('&')]
+    return coordinates
+
+def project_wsg_shape_to_csr(shape, csr):
+     transformer = Transformer.from_crs('epsg:4326', csr)
+     print(transformer)
+     project = lambda x, y: transformer.transform(x, y)
+     return transform(project, shape)
+
+
+
+
+def reproject_crs(product):
+  dts_crs = 'epsg:3857'
+  try:
+    with rio.open(product) as src:
+           transform, width, height = calculate_default_transform(src.crs, dts_crs, src.width, src.height, *src.bounds)
+           kwargs = src.meta.copy()
+           kwargs.update({
+                'crs': dts_crs,
+                'transform': transform,
+                'width': width,
+                'height': height
+            })
+           with rio.open(f'reprojected.tif', 'w', **kwargs) as dst:
+                for i in range(1, src.count + 1):
+                    reproject(
+                        source=rio.band(src, i),
+                        destination=rio.band(dst, i),
+                        src_transform=src.transform,
+                        src_crs=src.crs,
+                        dst_transform=transform,
+                        dst_crs=dts_crs,
+                        resampling=Resampling.nearest
+                    )
+  except: 
+    print('No se pudo reproyectar el tif al sistema epsg32614.')
 
 
 def load_landsat_image(file, coordenadas):
-    print(f'Opening file {file}')
-    ds = rio.open(file)
-    salida = ds.meta.copy()
-    print('salida', salida)
-    recorte, Transform = mask(ds, coordenadas, crop = True)
-    print('Se creo el recorte')
-    salida.update({
-        "driver": 'GTiff',
-        "height": recorte.shape[1],
+  print(f'Opening file {file}')
+  try:
+      ds = rio.open(file)
+      recorte, Transform = mask(ds, [coordenadas], crop = True, all_touched=True)
+      print('Recorte', recorte.shape[1],recorte.shape[1])
+      salida = ds.meta.copy()
+      salida.update({
+        'driver': 'GTiff',
+        'height': recorte.shape[1],
         "width": recorte.shape[2],
         "transform": Transform
-    })
+      })
 
-    Raster = rio.open('/Users/nazariocano/PYTHON' + 'recorte','w', salida )
-    Raster.write(recorte)
-    Raster.close()
-    return ds
+      Raster = rio.open('/Users/nazariocano/PYTHON/' + 'recorte.tif','w', **salida )
+      Raster.write(recorte)
+      Raster.close()
+      return ds
+  except:
+    print('No se creo el recorte') 
+
 
 
 def calc_medias(Datos):
@@ -65,41 +109,46 @@ def calc_histograma(datos, bandas):
     except:
         print('Error en le calculo de histograma')
 
-coord = [{
+coord = {
       "type": "Polygon",
       "coordinates": [
           [
             [
-              19.71807059924646
-              -101.26888275146484,
+              19.35001948171314,
+              -101.6015625
             ],
             [
-              19.71807059924646
-              -101.23935699462889,
+              19.35001948171314,
+              -101.1236572265625
             ],
             [
-              19.746024239625427
-              -101.23935699462889,
+              19.621892180319374,
+              -101.1236572265625
             ],
             [
-              19.746024239625427
-              -101.26888275146484,
+              19.621892180319374,
+              -101.6015625
             ],
             [
-              19.71807059924646
-              -101.26888275146484,
+              19.35001948171314,
+              -101.6015625
             ]
           ]
         ]
       }
-    
 
-]
+
+
+POLIG = Polygon([tuple(l) for l in coord['coordinates'][0]])
+#print(POLIG)
+
+CORDE = project_wsg_shape_to_csr(Polygon(POLIG), 'epsg:3857')
+#print('COODER', CORDE)
     
 #geo = project_wsg_shape_to_csr(shapely.geo.shape(coord), 'epsg:32637')
 
-
-raster = load_landsat_image('LC08_L1TP_027046_20211211_20211216_01_T1/LC08_L1TP_027046_20211211_20211216_01_T1_B1.TIF', coord)
+#REP = reproject_crs('2021/12/5/T14QKG/B02.TIF')
+raster = load_landsat_image('reprojected.tif', CORDE)
 
 #show_hist(raster.read(1), bins=1000, lw=0.0, stacked=False, alpha=0.3, histtype='stepfilled', title="Histograma")
 
@@ -124,12 +173,5 @@ raster = load_landsat_image('LC08_L1TP_027046_20211211_20211216_01_T1/LC08_L1TP_
 #lt.show()
 
 
-def project_wsg_shape_to_csr(shape, csr):
-     transformer = Transformer.from_crs('epsg:4326', csr)
-     project = lambda x, y: transformer.transform(x, y)
-     return transform(project, shape)
 
-def parseStringToPolygon(string):
-    coordinates = [(float(item.split('/')[1]), float(item.split('/')[0])) for item in string[:-1].split('&')]
-    return coordinates
 

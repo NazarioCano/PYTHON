@@ -108,7 +108,7 @@ def days(rango,year,day_init,day_fin):
      print('No hay fechas') 
 
 #fecha_inicial = '2021-8-6'
-fecha_inicial = '2021-11-5'
+fecha_inicial = '2021-12-5'
 fecha_final = '2021-12-30'
 
 #y = months(fecha_inicial,fecha_final)
@@ -116,14 +116,16 @@ fecha_final = '2021-12-30'
 
 
 
-def array_raster(ruta, filtro, year, mes, dias):
+def array_raster(ruta, filtro, year, mes, dias, coordenadas):
     image = {}
     path = Path(ruta)
     try:
         for dia in dias:
             file = Path(path,f'{year}/{mes}/{dia}/T14QKG/{filtro}.TIF')
             print(f'Opening file {file}')
-            ds = rio.open(file)
+            ds = rio.open(file)  #Abrimos el archivo
+            #recorte, Tranform = mask(ds, coordenadas, crop = True)
+
             image.update({dia: ds.read(1).astype(np.float32)})
         return image
     except:
@@ -139,11 +141,12 @@ def salida(FECHA_INICIAL, FECHA_FINAL):
         for mes in meses[0]:
             d = days(meses[0],meses[1],meses[2],meses[3])
             print('Ruta:', ruta)
-            print('Filtro: B01',  )
+            print('Filtro: B01')
             print('Año:', meses[1])
             print('Mes', mes)
             print('Dias', d[mes])
             ArrayR = array_raster(ruta, 'B01',meses[1],mes,d[mes])
+        return ArrayR
     except:
         print('No se cargaron los archivos')
 
@@ -151,6 +154,7 @@ def salida(FECHA_INICIAL, FECHA_FINAL):
 
 
 RES = salida(fecha_inicial, fecha_final)
+print('Salida:', RES)
 
 
 #RES = array_raster(ruta,['B11'], '2021', '12', '5')

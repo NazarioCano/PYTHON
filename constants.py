@@ -11,7 +11,7 @@ VEGETAL_INDEXES = [
     ]
 
 ALEJ = 'C:/Users/PC/S10/'
-NAZ = '/Users/nazariocano/PYTHON/'
+NAZ = '/Users/nazariocano/PYTHON/filtros'
 
 
 

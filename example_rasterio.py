@@ -20,7 +20,7 @@ def cambio_coordenadas(string):
     return coordenadas
 
 
-#Funcion trasform de wgs84 a ESPG:3857 
+#Funcion trasforma de wgs84 a ESPG:3857 
 def project_wsg_shape_to_csr(shape, csr):
      transformer = Transformer.from_crs('epsg:4326', csr)
      project = lambda x, y: transformer.transform(x, y)
@@ -60,8 +60,9 @@ def load_landsat_image(file, coordenadas):
   print(f'Opening file {file}......')
   try:
       ds = rio.open(file)
-      recorte, Transform = mask(ds, [coordenadas], crop = True, all_touched=True)
       salida = ds.meta.copy()
+      print(salida)
+      recorte, Transform = mask(ds, [coordenadas], crop = True, all_touched=True)
       salida.update({
         'driver': 'GTiff',
         'height': recorte.shape[1],
@@ -146,10 +147,10 @@ cambio = cambio_coordenadas(coord['coordinates'][0])
 poligono = project_wsg_shape_to_csr(Polygon(cambio), 'epsg:3857')
     
 
-REP = reproject_crs('2021/12/5/T14QKG/B02.TIF')
-raster = load_landsat_image('reprojected.tif', poligono)
+##REP = reproject_crs('2021/12/5/T14QKG/B02.TIF')
+raster = load_landsat_image('NDVI.tif', poligono)
 
-valores, frecuencias = calc_histograma(raster)
+#valores, frecuencias = calc_histograma(raster)
 
 
 

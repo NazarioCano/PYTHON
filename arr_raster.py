@@ -11,9 +11,8 @@ from pathlib import Path
 import os
 
 
-os.system ("clear")
 
-def months(inicial,final):
+def months(inicial,final,ruta, producto):
     fecha_init=re.findall('([A-Z0-9]{1,4})',inicial)
     year_init=int(fecha_init[0])
     month_init=int(fecha_init[1])
@@ -24,14 +23,22 @@ def months(inicial,final):
     month_fin=int(fecha_fin[1])
     day_fin=int(fecha_fin[2])
     
-    ruta = f'{NAZ}/{year_init}/*/'
+    ruta = f'{ruta}/{producto}/{year_init}/*/'
     fechas = glob.glob(ruta)
     meses=[]
     try:
         for fecha in fechas:
-            mes = int(re.findall('[0-9]+',fecha)[1])#Checar las rutas que contengan numeros #alejandro 2 nazario 1
+            mes = int(re.findall('[0-9]+',fecha)[2])#Checar las rutas que contengan numeros #alejandro 2 nazario 1
             meses.append(mes)  #Se agregan los meses
             meses.sort()
+        if month_init not in meses:
+            for mes in meses:
+                if mes > month_init:
+                    month_init=mes
+                    day_init=0
+                    break
+
+
         if month_init in meses:
             indice_in=meses.index(month_init)
 
@@ -44,7 +51,7 @@ def months(inicial,final):
     except TypeError as err:
         print('Error, ',  err)
 
-def days(rango,year,day_init,day_fin):
+def days(rango,year,day_init,day_fin,ruta, producto):
     RES = {}
     days=[]
     i=1
@@ -55,19 +62,34 @@ def days(rango,year,day_init,day_fin):
     try:
         for rang in rango:
             #print(i)
-            ruta = f'{NAZ}/{year}/{rang}/*/'
-            fechas = glob.glob(ruta)
+            ruta2 = f'{ruta}/{producto}/{year}/{rang}/*/'
+            fechas = glob.glob(ruta2)
+            print(fechas)
             dias=[]
             aux_dias=[]
 
             if  i==1 and num_meses!=1:  
                 i=i+ 1
                 for fecha in fechas:
-                    dia = int(re.findall('[0-9]+',fecha)[2])#Cambiar con respecto a la ruta #alejandro 3 nazario 2
+                    dia = int(re.findall('[0-9]+',fecha)[3])#Cambiar con respecto a la ruta #alejandro 3 nazario 2
                     dias.append(dia)
                     dias.sort()
+                if day_init in dias:
+                    indice_init=dias.index(day_init)
+
+                if day_init not in dias:
+                    for dia in dias:
+                        if dia > day_init:
+                            day_init=dia
+                            #print(day_init)
+                            break
                     if day_init in dias:
                         indice_init=dias.index(day_init)
+
+ 
+               # print(day_fin)
+   
+                #print(day_init)        
                 x=dias[indice_init:]
                 aux_dias=(x)
                 days.append(aux_dias)
@@ -75,19 +97,45 @@ def days(rango,year,day_init,day_fin):
 
             elif  i==num_meses:  
                 for fecha in fechas:
-                    dia = int(re.findall('[0-9]+',fecha)[2])
+                    dia = int(re.findall('[0-9]+',fecha)[3])
                     dias.append(dia)
                     dias.sort()
+                #print(day_init)
 
-                    if day_init in dias and i==num_meses:
+
+              
+
+                if day_fin in dias:
+                    indice_fin=dias.index(day_fin)
+                    print('Dia final', indice_fin)
+                
+                if day_init in dias:
+                   indice_init=dias.index(day_init)-1
+                   print('Dia inicial', indice_init)
+
+
+                if day_init not in dias and i==num_meses:
+                    print('No entro', day_init)
+                    for dia in dias:
+                        if dia > day_init:
+                            day_init=dia
+                            print(day_init)
+                            break
+                    if day_init in dias:
                         indice_init=dias.index(day_init)
-                    else:
-                        indice_init=0
+ 
+                #if day_fin not in dias:
+                 #   for diaf in dias:
+                  #      if diaf > day_fin:
+                   #         day_fin=diaf
+                            #print(day_fin)
+                            
+                    #        break
+                    #if day_fin in dias :
+                     #   indice_fin=dias.index(day_fin)-1
+                      #  indice_init=dias.index(day_init)-num_meses
 
-                    if day_fin in dias:
-                        indice_fin=dias.index(day_fin)+1
-
-                z=dias[indice_init:indice_fin]
+                z=dias[indice_init:]
                 aux_dias=(z)
                 days.append(aux_dias)
                 RES.update({rang:aux_dias})
@@ -95,10 +143,11 @@ def days(rango,year,day_init,day_fin):
             else:
                 i=i+ 1
                 for fecha in fechas:
-                    dia = int(re.findall('[0-9]+',fecha)[2])#alejandro 3 nazario 2
+                    dia = int(re.findall('[0-9]+',fecha)[3])#alejandro 3 nazario 2
                     aux_dias.append(dia)
                     aux_dias.sort() 
                 days.append(aux_dias)
+                #print(aux_dias)
             RES.update({rang:aux_dias})
 
         return RES
@@ -108,7 +157,7 @@ def days(rango,year,day_init,day_fin):
      print('Error ', err) 
 
 #fecha_inicial = '2021-8-6'
-fecha_inicial = '2021-12-14'
+fecha_inicial = '2021-10-14'
 fecha_final = '2021-12-30'
 
 #y = months(fecha_inicial,fecha_final)
@@ -116,34 +165,36 @@ fecha_final = '2021-12-30'
 
 
 
-def array_raster(ruta, filtro, year, mes, dias ):
+def array_raster(ruta, filtro, year, mes, dias, coordenadas, producto ):
     image = {}
     path = Path(ruta)
     try:
         for dia in dias:
-            file = Path(path,f'{year}/{mes}/{dia}/T14QKG/{filtro}.TIF')
+            file = Path(path,f'{producto}/{year}/{mes}/{dia}/{filtro}.tif')
             print(f'Opening file {file}')
             ds = rio.open(file)  #Abrimos el archivo
-            image.update({dia: ds.read(1)})
+            #RECORTE
+            recorte, Transform = mask(ds, [coordenadas], crop = True, all_touched=True)
+            image.update({dia: recorte})
         return image
     except TypeError as err:
         print('Error ', err)
 
 
-def salida(FECHA_INICIAL, FECHA_FINAL):
+def salida(FECHA_INICIAL, FECHA_FINAL, coord, producto, filtro):
     ruta = NAZ
     fecha_I = FECHA_INICIAL
     fecha_F = FECHA_FINAL
     try: 
-        meses = months(fecha_I, fecha_F)
+        meses = months(fecha_I, fecha_F,ruta, producto)
         for mes in meses[0]:
-            d = days(meses[0],meses[1],meses[2],meses[3])
+            d = days(meses[0],meses[1],meses[2],meses[3],ruta, producto)
             print('Ruta:', ruta)
-            print('Filtro: B01')
+            print('Filtro:', filtro)
             print('Año:', meses[1])
             print('Mes', mes)
             print('Dias', d[mes])
-            ArrayR = array_raster(ruta, 'B01',meses[1],mes,d[mes])
+            ArrayR = array_raster(ruta,filtro,meses[1],mes,d[mes], coord,producto)
         return ArrayR
     except TypeError as err:
         print('Error,',err)
@@ -151,8 +202,8 @@ def salida(FECHA_INICIAL, FECHA_FINAL):
 
 
 
-RES = salida(fecha_inicial, fecha_final)
-print('Salida:', RES)
+#RES = salida(fecha_inicial, fecha_final)
+#print('Salida:', RES)
 
 
 #RES = array_raster(ruta,['B11'], '2021', '12', '5')

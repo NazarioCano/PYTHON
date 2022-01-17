@@ -7,24 +7,28 @@ import statistics as stats
 from pyproj import Transformer
 from shapely.ops import transform
 from shapely.geometry import Polygon
-from rasterio.warp import calculate_default_transform, reproject, Resampling, Affine
+from rasterio.warp import calculate_default_transform, reproject, Resampling
+import os
 
 
+os.system ("clear")
+
+def cambio_coordenadas(string):
+    coordenadas = []
+    for val in string:
+      coordenadas.append([val[1], val[0]])
+    return coordenadas
 
 
-def parseStringToPolygon(string):
-    coordinates = [(float(item.split('/')[1]), float(item.split('/')[0])) for item in string[:-1].split('&')]
-    return coordinates
-
+#Funcion trasform de wgs84 a ESPG:3857 
 def project_wsg_shape_to_csr(shape, csr):
      transformer = Transformer.from_crs('epsg:4326', csr)
-     print(transformer)
      project = lambda x, y: transformer.transform(x, y)
      return transform(project, shape)
 
 
 
-
+#FUNCION QUE CALCULA LA REPROYECCION 
 def reproject_crs(product):
   dts_crs = 'epsg:3857'
   try:
@@ -48,16 +52,15 @@ def reproject_crs(product):
                         dst_crs=dts_crs,
                         resampling=Resampling.nearest
                     )
-  except: 
-    print('No se pudo reproyectar el tif al sistema epsg32614.')
+  except TypeError as err: 
+    print('No se pudo reproyectar el tif al sistema epsg32614.\n  Error, ',err)
 
 
 def load_landsat_image(file, coordenadas):
-  print(f'Opening file {file}')
+  print(f'Opening file {file}......')
   try:
       ds = rio.open(file)
       recorte, Transform = mask(ds, [coordenadas], crop = True, all_touched=True)
-      print('Recorte', recorte.shape[1],recorte.shape[1])
       salida = ds.meta.copy()
       salida.update({
         'driver': 'GTiff',
@@ -69,9 +72,9 @@ def load_landsat_image(file, coordenadas):
       Raster = rio.open('/Users/nazariocano/PYTHON/' + 'recorte.tif','w', **salida )
       Raster.write(recorte)
       Raster.close()
-      return ds
-  except:
-    print('No se creo el recorte') 
+      return recorte
+  except TypeError as err:
+    print('No se creo el recorte \n Error,', err ) 
 
 
 
@@ -89,22 +92,22 @@ def calc_medias(Datos):
         print('Media alta:', media_alta)
 
         return media, media_baja, media_alta
-    except: 
-        print('Error al hacer los caculos')
+    except TypeError as err: 
+        print('Error al hacer los caculos\n Error, ', err)
 
 
-def calc_histograma(datos, bandas):
-    print('Bandas',bandas)
+def calc_histograma(datos):
+    print('Hiniciando calculo de histograma....')
     try:
         unique, counts = np.unique(datos, return_counts = True)
         valores = unique
         frecuencias = counts
-        plt.plot(valores, frecuencias)
+        plt.plot(valores, frecuencias,color="blue", linewidth=0.5, linestyle="-")
         plt.grid(True)
         plt.xlabel('Valor')
         plt.ylabel('Frecuencia')
         plt.title('Histograma')
-        #plt.show()
+        plt.show()
         return unique, counts
     except:
         print('Error en le calculo de histograma')
@@ -114,58 +117,69 @@ coord = {
       "coordinates": [
           [
             [
-              19.35001948171314,
-              -101.6015625
+              -101.69563293457031,
+              19.557202031700292
             ],
             [
-              19.35001948171314,
-              -101.1236572265625
+              -101.51092529296875,
+              19.557202031700292
             ],
             [
-              19.621892180319374,
-              -101.1236572265625
+              -101.51092529296875,
+              19.686879555099367
             ],
             [
-              19.621892180319374,
-              -101.6015625
+              -101.69563293457031,
+              19.686879555099367
             ],
             [
-              19.35001948171314,
-              -101.6015625
+              -101.69563293457031,
+              19.557202031700292
             ]
           ]
         ]
       }
 
 
+cambio = cambio_coordenadas(coord['coordinates'][0])
 
-POLIG = Polygon([tuple(l) for l in coord['coordinates'][0]])
-#print(POLIG)
-
-CORDE = project_wsg_shape_to_csr(Polygon(POLIG), 'epsg:3857')
-#print('COODER', CORDE)
+poligono = project_wsg_shape_to_csr(Polygon(cambio), 'epsg:3857')
     
-#geo = project_wsg_shape_to_csr(shapely.geo.shape(coord), 'epsg:32637')
 
-#REP = reproject_crs('2021/12/5/T14QKG/B02.TIF')
-raster = load_landsat_image('reprojected.tif', CORDE)
+REP = reproject_crs('2021/12/5/T14QKG/B02.TIF')
+raster = load_landsat_image('reprojected.tif', poligono)
+
+valores, frecuencias = calc_histograma(raster)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #show_hist(raster.read(1), bins=1000, lw=0.0, stacked=False, alpha=0.3, histtype='stepfilled', title="Histograma")
 
 #ds = raster.read(1)
 #bandas = raster.count
-#valores, frecuencias = calc_histograma(ds, bandas)
-
 
 #calc_medias(valores)
-
-
-
 #Calculo de Media, Media alta y Media baja
 
-
-
-
+#Convercion de cordenadas a poligono
+#POLIG = Polygon([tuple(l) for l in coord['coordinates'][0]])
+#print(POLIG)
 
 #np.savetxt('salida.csv', valores, delimiter=',')#Imprimir valores en un rchivo de texto
 #('Calculo', len(valores), len(frecuencias))

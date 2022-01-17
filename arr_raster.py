@@ -1,6 +1,5 @@
-from multiprocessing.dummy import Array
 from constants import ALEJ, NAZ
-from example_rasterio import calc_histograma
+#from example_rasterio import calc_histograma
 import numpy as np
 import rasterio as rio
 import glob
@@ -9,9 +8,10 @@ from rasterio.plot import show_hist, show
 from rasterio.mask import mask
 from matplotlib import pyplot as plt
 from pathlib import Path
+import os
 
-#ruta = '/Users/nazariocano/Desktop/PYTHON'
-#RES = load_landsat_image(ruta,['BO3'], '2021', '12', '5')
+
+os.system ("clear")
 
 def months(inicial,final):
     fecha_init=re.findall('([A-Z0-9]{1,4})',inicial)
@@ -41,8 +41,8 @@ def months(inicial,final):
         rango= meses[indice_in:indice_fin]
         return(rango,year_init,day_init,day_fin) 
 
-    except:
-        print('Error, no se encontraron fechas disponibles')
+    except TypeError as err:
+        print('Error, ',  err)
 
 def days(rango,year,day_init,day_fin):
     RES = {}
@@ -104,11 +104,11 @@ def days(rango,year,day_init,day_fin):
         return RES
     
             
-    except:
-     print('No hay fechas') 
+    except TypeError as err:
+     print('Error ', err) 
 
 #fecha_inicial = '2021-8-6'
-fecha_inicial = '2021-12-5'
+fecha_inicial = '2021-12-14'
 fecha_final = '2021-12-30'
 
 #y = months(fecha_inicial,fecha_final)
@@ -116,7 +116,7 @@ fecha_final = '2021-12-30'
 
 
 
-def array_raster(ruta, filtro, year, mes, dias, coordenadas):
+def array_raster(ruta, filtro, year, mes, dias ):
     image = {}
     path = Path(ruta)
     try:
@@ -124,12 +124,10 @@ def array_raster(ruta, filtro, year, mes, dias, coordenadas):
             file = Path(path,f'{year}/{mes}/{dia}/T14QKG/{filtro}.TIF')
             print(f'Opening file {file}')
             ds = rio.open(file)  #Abrimos el archivo
-            #recorte, Tranform = mask(ds, coordenadas, crop = True)
-
-            image.update({dia: ds.read(1).astype(np.float32)})
+            image.update({dia: ds.read(1)})
         return image
-    except:
-        print('No se encontraron acrchivos')
+    except TypeError as err:
+        print('Error ', err)
 
 
 def salida(FECHA_INICIAL, FECHA_FINAL):
@@ -147,8 +145,8 @@ def salida(FECHA_INICIAL, FECHA_FINAL):
             print('Dias', d[mes])
             ArrayR = array_raster(ruta, 'B01',meses[1],mes,d[mes])
         return ArrayR
-    except:
-        print('No se cargaron los archivos')
+    except TypeError as err:
+        print('Error,',err)
 
 
 

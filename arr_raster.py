@@ -14,7 +14,7 @@ import os
 
 #ruta = '/Users/nazariocano/Desktop/PYTHON'
 #RES = load_landsat_image(ruta,['BO3'], '2021', '12', '5')
-os.system('cls')
+os.system('clear')
 def months(inicial,final,ruta,producto):
     fecha_init=re.findall('([A-Z0-9]{1,4})',inicial)
     year_init=int(fecha_init[0])
@@ -62,7 +62,7 @@ def days(rango,year,day_init,day_fin,ruta, producto):
 
     try:
         for rang in rango:
-            ruta = f'{ALEJ}/{producto}/{year}/{rang}/*/'
+            ruta = f'{NAZ}/{producto}/{year}/{rang}/*/'
             fechas = glob.glob(ruta)
             dias=[]
             aux_dias=[]
@@ -170,7 +170,7 @@ def array_raster(ruta, filtro, year, mes, dias, coordenadas, producto ):
 
 
 def salida(FECHA_INICIAL, FECHA_FINAL, coord, producto, filtro):
-    ruta = ALEJ
+    ruta = NAZ
     fecha_I = FECHA_INICIAL
     fecha_F = FECHA_FINAL
     try: 

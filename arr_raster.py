@@ -24,14 +24,22 @@ def months(inicial,final):
     month_fin=int(fecha_fin[1])
     day_fin=int(fecha_fin[2])
     
-    ruta = f'{NAZ}/{year_init}/*/'
+    ruta = f'{ALEJ}/{year_init}/*/'
     fechas = glob.glob(ruta)
     meses=[]
     try:
+ 
         for fecha in fechas:
-            mes = int(re.findall('[0-9]+',fecha)[1])#Checar las rutas que contengan numeros #alejandro 2 nazario 1
+            mes = int(re.findall('[0-9]+',fecha)[2])#Checar las rutas que contengan numeros #alejandro 2 nazario 1
             meses.append(mes)  #Se agregan los meses
             meses.sort()
+
+        if month_init not in meses:
+            for mes in meses:
+                if mes > month_init:
+                    month_init=mes
+                    break
+   
         if month_init in meses:
             indice_in=meses.index(month_init)
 
@@ -50,12 +58,11 @@ def days(rango,year,day_init,day_fin):
     i=1
     num_meses=len(rango)
     meses=rango
-    #print(meses)
-    #print(num_meses)
+
     try:
         for rang in rango:
             #print(i)
-            ruta = f'{NAZ}/{year}/{rang}/*/'
+            ruta = f'{ALEJ}/{year}/{rang}/*/'
             fechas = glob.glob(ruta)
             dias=[]
             aux_dias=[]
@@ -63,11 +70,25 @@ def days(rango,year,day_init,day_fin):
             if  i==1 and num_meses!=1:  
                 i=i+ 1
                 for fecha in fechas:
-                    dia = int(re.findall('[0-9]+',fecha)[2])#Cambiar con respecto a la ruta #alejandro 3 nazario 2
+                    dia = int(re.findall('[0-9]+',fecha)[3])#Cambiar con respecto a la ruta #alejandro 3 nazario 2
                     dias.append(dia)
                     dias.sort()
+                if day_init in dias:
+                    indice_init=dias.index(day_init)
+
+                if day_init not in dias:
+                    for dia in dias:
+                        if dia > day_init:
+                            day_init=dia
+                            #print(day_init)
+                            break
                     if day_init in dias:
                         indice_init=dias.index(day_init)
+
+ 
+               # print(day_fin)
+   
+                #print(day_init)        
                 x=dias[indice_init:]
                 aux_dias=(x)
                 days.append(aux_dias)
@@ -75,19 +96,30 @@ def days(rango,year,day_init,day_fin):
 
             elif  i==num_meses:  
                 for fecha in fechas:
-                    dia = int(re.findall('[0-9]+',fecha)[2])
+                    dia = int(re.findall('[0-9]+',fecha)[3])
                     dias.append(dia)
                     dias.sort()
+                print(day_init)
+ 
+                if day_fin in dias:
+                    indice_fin=dias.index(day_fin)
+                
+                if day_init in dias:
+                   indice_init=dias.index(day_init)-num_meses
 
-                    if day_init in dias and i==num_meses:
-                        indice_init=dias.index(day_init)
-                    else:
-                        indice_init=0
+ 
+                if day_fin not in dias:
+                    for diaf in dias:
+                        if diaf > day_fin:
+                            day_fin=diaf
+                            #print(day_fin)
+                            
+                            break
+                    if day_fin in dias :
+                        indice_fin=dias.index(day_fin)-1
+                        
 
-                    if day_fin in dias:
-                        indice_fin=dias.index(day_fin)+1
-
-                z=dias[indice_init:indice_fin]
+                z=dias[indice_init:indice_fin+1]
                 aux_dias=(z)
                 days.append(aux_dias)
                 RES.update({rang:aux_dias})
@@ -95,10 +127,11 @@ def days(rango,year,day_init,day_fin):
             else:
                 i=i+ 1
                 for fecha in fechas:
-                    dia = int(re.findall('[0-9]+',fecha)[2])#alejandro 3 nazario 2
+                    dia = int(re.findall('[0-9]+',fecha)[3])#alejandro 3 nazario 2
                     aux_dias.append(dia)
                     aux_dias.sort() 
                 days.append(aux_dias)
+                #print(aux_dias)
             RES.update({rang:aux_dias})
 
         return RES
@@ -131,7 +164,7 @@ def array_raster(ruta, filtro, year, mes, dias ):
 
 
 def salida(FECHA_INICIAL, FECHA_FINAL):
-    ruta = NAZ
+    ruta = ALEJ
     fecha_I = FECHA_INICIAL
     fecha_F = FECHA_FINAL
     try: 
@@ -149,8 +182,8 @@ def salida(FECHA_INICIAL, FECHA_FINAL):
         print('Error,',err)
 
 
-
-
+#fecha_inicial = '2021-10-8'
+#fecha_final = '2021-12-30'
 RES = salida(fecha_inicial, fecha_final)
 print('Salida:', RES)
 
@@ -159,5 +192,4 @@ print('Salida:', RES)
 #print(type(RES['B11']))
 #print(RES.shape)
 #calc_histograma(RES['B11'],1)
-
 

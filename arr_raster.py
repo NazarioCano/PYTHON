@@ -27,6 +27,7 @@ def months(inicial,final,ruta, producto):
     fechas = glob.glob(ruta)
     meses=[]
     try:
+ 
         for fecha in fechas:
             mes = int(re.findall('[0-9]+',fecha)[2])#Checar las rutas que contengan numeros #alejandro 2 nazario 1
             meses.append(mes)  #Se agregan los meses
@@ -57,8 +58,7 @@ def days(rango,year,day_init,day_fin,ruta, producto):
     i=1
     num_meses=len(rango)
     meses=rango
-    #print(meses)
-    #print(num_meses)
+
     try:
         for rang in rango:
             #print(i)
@@ -210,5 +210,4 @@ def salida(FECHA_INICIAL, FECHA_FINAL, coord, producto, filtro):
 #print(type(RES['B11']))
 #print(RES.shape)
 #calc_histograma(RES['B11'],1)
-
 

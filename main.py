@@ -26,24 +26,24 @@ coord = {
       "coordinates": [
           [
             [
-              -101.26259565353394,
-              19.679464727543987
+              -101.25211358070374,
+              19.677151311915576
             ],
             [
-              -101.2575101852417,
-              19.679464727543987
+              -101.25096559524536,
+              19.677151311915576
             ],
             [
-              -101.2575101852417,
-              19.682111476502076
+              -101.25096559524536,
+              19.67790898446818
             ],
             [
-              -101.26259565353394,
-              19.682111476502076
+              -101.25211358070374,
+              19.67790898446818
             ],
             [
-              -101.26259565353394,
-              19.679464727543987
+              -101.25211358070374,
+              19.677151311915576
             ]
           ]
         ]
@@ -56,13 +56,25 @@ fecha_final = '2021-12-25'
 
 PRODUCTO = 'L30'
 FILTRO = 'NDVI'
+  
+
 
 def main(fechaI, fechaF, producto, filtro, coord):
+
     try: 
         recortes = salida(fechaI, fechaF, coord, producto, filtro)
-        print(recortes)
-
+        for mes in recortes:
+          res = recortes[mes]
+          media = np.mean(res)
+          alto = np.amax(res)
+          bajo = np.amin(res)
+          print('Alto: ', alto) 
+          print('Bajo: ', bajo)
+          print('Media ', media)
+          print('\n')
     except TypeError as err:
         print('Error,', err)
 
 RES = main(fecha_inicial, fecha_final, PRODUCTO, FILTRO, poligono)
+
+

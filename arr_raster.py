@@ -1,3 +1,5 @@
+from calendar import month
+from multiprocessing.dummy import Array
 from constants import ALEJ, NAZ
 #from example_rasterio import calc_histograma
 import numpy as np
@@ -10,9 +12,10 @@ from matplotlib import pyplot as plt
 from pathlib import Path
 import os
 
-
-
-def months(inicial,final,ruta, producto):
+#ruta = '/Users/nazariocano/Desktop/PYTHON'
+#RES = load_landsat_image(ruta,['BO3'], '2021', '12', '5')
+os.system('cls')
+def months(inicial,final,ruta,producto):
     fecha_init=re.findall('([A-Z0-9]{1,4})',inicial)
     year_init=int(fecha_init[0])
     month_init=int(fecha_init[1])
@@ -38,8 +41,7 @@ def months(inicial,final,ruta, producto):
                     month_init=mes
                     day_init=0
                     break
-
-
+                    
         if month_init in meses:
             indice_in=meses.index(month_init)
 
@@ -49,22 +51,19 @@ def months(inicial,final,ruta, producto):
         rango= meses[indice_in:indice_fin]
         return(rango,year_init,day_init,day_fin) 
 
-    except TypeError as err:
-        print('Error, ',  err)
+    except:
+        print('Error, no se encontraron fechas disponibles')
 
 def days(rango,year,day_init,day_fin,ruta, producto):
     RES = {}
     days=[]
     i=1
     num_meses=len(rango)
-    meses=rango
 
     try:
         for rang in rango:
-            #print(i)
-            ruta2 = f'{ruta}/{producto}/{year}/{rang}/*/'
-            fechas = glob.glob(ruta2)
-            print(fechas)
+            ruta = f'{ALEJ}/{producto}/{year}/{rang}/*/'
+            fechas = glob.glob(ruta)
             dias=[]
             aux_dias=[]
 
@@ -81,15 +80,10 @@ def days(rango,year,day_init,day_fin,ruta, producto):
                     for dia in dias:
                         if dia > day_init:
                             day_init=dia
-                            #print(day_init)
                             break
                     if day_init in dias:
                         indice_init=dias.index(day_init)
 
- 
-               # print(day_fin)
-   
-                #print(day_init)        
                 x=dias[indice_init:]
                 aux_dias=(x)
                 days.append(aux_dias)
@@ -100,40 +94,38 @@ def days(rango,year,day_init,day_fin,ruta, producto):
                     dia = int(re.findall('[0-9]+',fecha)[3])
                     dias.append(dia)
                     dias.sort()
-                #print(day_init)
-
-
-              
 
                 if day_fin in dias:
                     indice_fin=dias.index(day_fin)
                     print('Dia final', indice_fin)
                 
                 if day_init in dias:
-                   indice_init=dias.index(day_init)-1
-                   print('Dia inicial', indice_init)
+                   indice_init=0
 
 
                 if day_init not in dias and i==num_meses:
-                    print('No entro', day_init)
                     for dia in dias:
                         if dia > day_init:
                             day_init=dia
-                            print(day_init)
                             break
-                    if day_init in dias:
+                    if day_init in dias and i!=1:
+                       # indice_init=dias.index(day_init)-num_meses
+                        indice_init=0
+                    else:
                         indice_init=dias.index(day_init)
- 
-                #if day_fin not in dias:
-                 #   for diaf in dias:
-                  #      if diaf > day_fin:
-                   #         day_fin=diaf
-                            #print(day_fin)
-                            
-                    #        break
-                    #if day_fin in dias :
-                     #   indice_fin=dias.index(day_fin)-1
-                      #  indice_init=dias.index(day_init)-num_meses
+
+                if day_fin not in dias:
+                    num_dias=len(dias)
+                    for diaf in dias:
+                        if diaf > day_fin:
+                            day_fin=diaf
+                            break
+            
+                    if day_fin in dias :
+                        indice_fin=dias.index(day_fin)-1
+
+                    else:
+                        indice_fin=dias[num_dias-1]
 
                 z=dias[indice_init:]
                 aux_dias=(z)
@@ -147,7 +139,6 @@ def days(rango,year,day_init,day_fin,ruta, producto):
                     aux_dias.append(dia)
                     aux_dias.sort() 
                 days.append(aux_dias)
-                #print(aux_dias)
             RES.update({rang:aux_dias})
 
         return RES
@@ -156,12 +147,9 @@ def days(rango,year,day_init,day_fin,ruta, producto):
     except TypeError as err:
      print('Error ', err) 
 
-#fecha_inicial = '2021-8-6'
-fecha_inicial = '2021-10-14'
-fecha_final = '2021-12-30'
 
-#y = months(fecha_inicial,fecha_final)
-#d, RES = days(y[0],y[1],y[2],y[3])
+fecha_inicial = '2021-12-12'
+fecha_final = '2021-12-31' #anterior
 
 
 
@@ -177,12 +165,12 @@ def array_raster(ruta, filtro, year, mes, dias, coordenadas, producto ):
             recorte, Transform = mask(ds, [coordenadas], crop = True, all_touched=True)
             image.update({dia: recorte})
         return image
-    except TypeError as err:
-        print('Error ', err)
+    except:
+        print('No se encontraron acrchivos')
 
 
 def salida(FECHA_INICIAL, FECHA_FINAL, coord, producto, filtro):
-    ruta = NAZ
+    ruta = ALEJ
     fecha_I = FECHA_INICIAL
     fecha_F = FECHA_FINAL
     try: 

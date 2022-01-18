@@ -50,28 +50,29 @@ coord = {
 
 Ncoord = cambio_coord(coord['coordinates'][0])
 poligono = project_wsg_shape_to_csr(Polygon(Ncoord), 'epsg:3857')
-fecha_inicial = '2021-11-5'
-fecha_final = '2021-12-11'
-
-PRODUCTO = 'L30'
+fecha_inicial = '2021-10-12'
+fecha_final = '2021-12-8'
+PRODUCTO = 'S10'
 FILTRO = 'NDVI'
-UNITARIO =  True
+  
+def main(fechaI, fechaF, producto, filtro, coord):
 
-
-
-def main(fechaI, fechaF, producto, filtro, coord):  
     try: 
-        recortes = salida(fechaI, fechaF, coord, producto, filtro)
-        print(recortes)
-        for mes in recortes:
-          res = recortes[mes]
-          media = np.mean(res)
-          alto = np.amax(res)
-          bajo = np.amin(res)
-          print('Alto: ', alto) 
-          print('Media ', media)
-          print('Baja: ', bajo)
-          print('\n')
+        recortes,x = salida(fechaI, fechaF, coord, producto, filtro)
+        i=0
+        for recorte in recortes:
+          for mes in recorte:
+            res = recorte[mes]
+            media = np.mean(res)
+            alto = np.amax(res)
+            bajo = np.amin(res)
+            print('MES',x[i])
+            print('Dia:',mes)
+            print('Alto: ', alto) 
+            print('Bajo: ', bajo)
+            print('Media ', media)
+            print('\n')
+          i=i+1
     except TypeError as err:
         print('Error,', err)
 

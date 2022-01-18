@@ -1,7 +1,4 @@
-from calendar import month
-from multiprocessing.dummy import Array
 from constants import ALEJ, NAZ
-#from example_rasterio import calc_histograma
 import numpy as np
 import rasterio as rio
 import glob
@@ -12,8 +9,6 @@ from matplotlib import pyplot as plt
 from pathlib import Path
 import os
 
-#ruta = '/Users/nazariocano/Desktop/PYTHON'
-#RES = load_landsat_image(ruta,['BO3'], '2021', '12', '5')
 os.system('clear')
 def months(inicial,final,ruta,producto):
     fecha_init=re.findall('([A-Z0-9]{1,4})',inicial)
@@ -148,11 +143,6 @@ def days(rango,year,day_init,day_fin,ruta, producto):
      print('Error ', err) 
 
 
-fecha_inicial = '2021-12-12'
-fecha_final = '2021-12-31' #anterior
-
-
-
 def array_raster(ruta, filtro, year, mes, dias, coordenadas, producto ):
     image = {}
     path = Path(ruta)
@@ -163,10 +153,13 @@ def array_raster(ruta, filtro, year, mes, dias, coordenadas, producto ):
             ds = rio.open(file)  #Abrimos el archivo
             #RECORTE
             recorte, Transform = mask(ds, [coordenadas], crop = True, all_touched=True)
-            image.update({dia: recorte})
+            if (recorte): 
+                continue
+            
+            image.update({ dia: recorte })
         return image
     except:
-        print('No se encontraron acrchivos')
+        print('No se encontraron achivos')
 
 
 def salida(FECHA_INICIAL, FECHA_FINAL, coord, producto, filtro):
@@ -182,20 +175,7 @@ def salida(FECHA_INICIAL, FECHA_FINAL, coord, producto, filtro):
             print('Año:', meses[1])
             print('Mes', mes)
             print('Dias', d[mes])
-            ArrayR = array_raster(ruta,filtro,meses[1],mes,d[mes], coord,producto)
+            ArrayR = array_raster(ruta,filtro,meses[1],mes,d[mes],coord,producto)
         return ArrayR
     except TypeError as err:
         print('Error,',err)
-
-
-
-
-#RES = salida(fecha_inicial, fecha_final)
-#print('Salida:', RES)
-
-
-#RES = array_raster(ruta,['B11'], '2021', '12', '5')
-#print(type(RES['B11']))
-#print(RES.shape)
-#calc_histograma(RES['B11'],1)
-

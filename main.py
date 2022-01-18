@@ -1,8 +1,5 @@
 from arr_raster import salida
 import numpy as np
-import rasterio as rio
-from rasterio.plot import show_hist, show
-from rasterio.mask import mask
 from matplotlib import pyplot as plt
 from pyproj import Transformer
 from shapely.ops import transform
@@ -26,51 +23,54 @@ coord = {
       "coordinates": [
           [
             [
-              -101.25211358070374,
-              19.677151311915576
+              -101.5932047367096,
+              19.648437934086825
             ],
             [
-              -101.25096559524536,
-              19.677151311915576
+              -101.59238934516907,
+              19.648437934086825
             ],
             [
-              -101.25096559524536,
-              19.67790898446818
+              -101.59238934516907,
+              19.64898355638197
             ],
             [
-              -101.25211358070374,
-              19.67790898446818
+              -101.5932047367096,
+              19.64898355638197
             ],
             [
-              -101.25211358070374,
-              19.677151311915576
+              -101.5932047367096,
+              19.648437934086825
             ]
           ]
         ]
+
+
       }
 
 Ncoord = cambio_coord(coord['coordinates'][0])
 poligono = project_wsg_shape_to_csr(Polygon(Ncoord), 'epsg:3857')
-fecha_inicial = '2021-12-10'
-fecha_final = '2021-12-25'
+fecha_inicial = '2021-11-5'
+fecha_final = '2021-12-11'
 
 PRODUCTO = 'L30'
 FILTRO = 'NDVI'
-  
+UNITARIO =  True
 
 
-def main(fechaI, fechaF, producto, filtro, coord):
 
+def main(fechaI, fechaF, producto, filtro, coord):  
     try: 
         recortes = salida(fechaI, fechaF, coord, producto, filtro)
+        print(recortes)
         for mes in recortes:
           res = recortes[mes]
           media = np.mean(res)
           alto = np.amax(res)
           bajo = np.amin(res)
           print('Alto: ', alto) 
-          print('Bajo: ', bajo)
           print('Media ', media)
+          print('Baja: ', bajo)
           print('\n')
     except TypeError as err:
         print('Error,', err)

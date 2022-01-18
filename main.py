@@ -1,21 +1,20 @@
-from arr_raster import salida
+from arr_raster import cambio_coord, project_wsg_shape_to_csr, salida
 import numpy as np
 from matplotlib import pyplot as plt
-from pyproj import Transformer
-from shapely.ops import transform
 from shapely.geometry import Polygon
 
 
-def cambio_coord(string):
-    coordenadas = []
-    for val in string:
-      coordenadas.append([val[1], val[0]])
-    return coordenadas
-
-def project_wsg_shape_to_csr(shape, csr):
-     transformer = Transformer.from_crs('epsg:4326', csr)
-     project = lambda x, y: transformer.transform(x, y)
-     return transform(project, shape)
+def arreglo_valores(arrayVal):
+  Altos = []
+  Medios = []
+  Bajos = []
+  Fechas = []
+  for fecha in arrayVal:
+    Altos.append(fecha['valores'][0])
+    Medios.append(fecha['valores'][1])
+    Bajos.append(fecha['valores'][2])
+    Fechas.append(fecha['fecha'])
+  return Altos, Medios, Bajos, Fechas
 
 
 coord = {
@@ -23,58 +22,68 @@ coord = {
       "coordinates": [
           [
             [
-              -101.5932047367096,
-              19.648437934086825
+              -102.14064359664917,
+              19.6667354767774
             ],
             [
-              -101.59238934516907,
-              19.648437934086825
+              -102.13611602783202,
+              19.6667354767774
             ],
             [
-              -101.59238934516907,
-              19.64898355638197
+              -102.13611602783202,
+              19.669978500925723
             ],
             [
-              -101.5932047367096,
-              19.64898355638197
+              -102.14064359664917,
+              19.669978500925723
             ],
             [
-              -101.5932047367096,
-              19.648437934086825
+              -102.14064359664917,
+              19.6667354767774
             ]
           ]
         ]
-
-
       }
 
-Ncoord = cambio_coord(coord['coordinates'][0])
+Ncoord = cambio_coord (coord['coordinates'][0])
 poligono = project_wsg_shape_to_csr(Polygon(Ncoord), 'epsg:3857')
-fecha_inicial = '2021-10-12'
-fecha_final = '2021-12-30'
+fecha_inicial = '2021-11-1'
+fecha_final = '2021-12-20'
 PRODUCTO = 'L30'
 FILTRO = 'NDVI'
   
 def main(fechaI, fechaF, producto, filtro, coord):
+  mesesInvalidos = []
+  datosSalida = []
+  try: 
+      recortes,x = salida(fechaI, fechaF, coord, producto, filtro)
+      i=0
+      for recorte in recortes:
+        for mes in recorte:
+          res = recorte[mes]
+          media = np.mean(res)
+          alto = np.amax(res)
+          bajo = np.amin(res)
+          print('MES',x[i])
+          print('Dia:',mes)
+          print('Alto: ', alto) 
+          print('Media ', media)
+          print('Bajo: ', bajo)
+          print('\n')
 
-    try: 
-        recortes,x = salida(fechaI, fechaF, coord, producto, filtro)
-        i=0
-        for recorte in recortes:
-          for mes in recorte:
-            res = recorte[mes]
-            media = np.mean(res)
-            alto = np.amax(res)
-            bajo = np.amin(res)
-            print('MES',x[i])
-            print('Dia:',mes)
-            print('Alto: ', alto) 
-            print('Bajo: ', bajo)
-            print('Media ', media)
-            print('\n')
-          i=i+1
-    except TypeError as err:
-        print('Error,', err)
+          if alto > 1 or bajo < -1:
+            mesesInvalidos.append({x[i]: mes})
+            continue
+          datosSalida.append({
+             'fecha': str(x[i]) + '-' + str(mes),
+             'valores': [alto, media, bajo]}
+          )
+        i=i+1
+      altos, medios, bajos, fechas = arreglo_valores(datosSalida)
+      print(fechas)
+  except TypeError as err:
+    print('Error,', err)
+
 
 RES = main(fecha_inicial, fecha_final, PRODUCTO, FILTRO, poligono)
 

@@ -7,9 +7,24 @@ from rasterio.plot import show_hist, show
 from rasterio.mask import mask
 from matplotlib import pyplot as plt
 from pathlib import Path
+from pyproj import Transformer
+from shapely.ops import transform
+
 import os
 
 os.system('clear')
+
+def cambio_coord(string):
+    coordenadas = []
+    for val in string:
+      coordenadas.append([val[1], val[0]])
+    return coordenadas
+
+def project_wsg_shape_to_csr(shape, csr):
+     transformer = Transformer.from_crs('epsg:4326', csr)
+     project = lambda x, y: transformer.transform(x, y)
+     return transform(project, shape)
+
 def months(inicial,final,ruta,producto):
     fecha_init=re.findall('([A-Z0-9]{1,4})',inicial)
     year_init=int(fecha_init[0])
@@ -98,8 +113,12 @@ def days(rango,year,day_init,day_fin,ruta, producto):
                 if day_fin in dias:
                     indice_fin=dias.index(day_fin)
                 
-                if day_init in dias:
+                if day_init in dias and i==1:
+                   indice_init=dias.index(day_init)
+
+                elif day_init in dias and i!=1:
                    indice_init=0
+
 
 
                 if day_init not in dias and i==num_meses:

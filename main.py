@@ -51,8 +51,8 @@ coord = {
 Ncoord = cambio_coord(coord['coordinates'][0])
 poligono = project_wsg_shape_to_csr(Polygon(Ncoord), 'epsg:3857')
 fecha_inicial = '2021-10-12'
-fecha_final = '2021-12-8'
-PRODUCTO = 'S10'
+fecha_final = '2021-12-30'
+PRODUCTO = 'L30'
 FILTRO = 'NDVI'
   
 def main(fechaI, fechaF, producto, filtro, coord):

@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 from pathlib import Path
 import os
 
-#os.system('clear')
+os.system('clear')
 def months(inicial,final,ruta,producto):
     fecha_init=re.findall('([A-Z0-9]{1,4})',inicial)
     year_init=int(fecha_init[0])
@@ -57,7 +57,7 @@ def days(rango,year,day_init,day_fin,ruta, producto):
 
     try:
         for rang in rango:
-            ruta = f'{ALEJ}/{producto}/{year}/{rang}/*/'
+            ruta = f'{NAZ}/{producto}/{year}/{rang}/*/'
             fechas = glob.glob(ruta)
             dias=[]
             aux_dias=[]
@@ -155,7 +155,7 @@ def array_raster(ruta, filtro, year, mes, dias, coordenadas, producto ):
     try:
         for dia in dias:
             file = Path(path,f'{producto}/{year}/{mes}/{dia}/{filtro}.tif')
-            #print(f'Opening file {file}')#######
+            print(f'Opening file {file}')#######
             ds = rio.open(file)  #Abrimos el archivo
             #RECORTE
             recorte, Transform = mask(ds, [coordenadas], crop = True, all_touched=True)
@@ -168,7 +168,7 @@ def array_raster(ruta, filtro, year, mes, dias, coordenadas, producto ):
 
 
 def salida(FECHA_INICIAL, FECHA_FINAL, coord, producto, filtro):
-    ruta = ALEJ
+    ruta = NAZ
     fecha_I = FECHA_INICIAL
     fecha_F = FECHA_FINAL
     ArrayR=[]
@@ -180,11 +180,11 @@ def salida(FECHA_INICIAL, FECHA_FINAL, coord, producto, filtro):
             d = days(meses[0],meses[1],meses[2],meses[3],ruta, producto)
             if d[mes] == []:
                 continue
-            #print('Ruta:', ruta)
-            #print('Filtro:', filtro)
-            #print('Año:', meses[1])
-            #print('Mes', mes)
-            #print('Dias', d[mes])
+            print('Ruta:', ruta)
+            print('Filtro:', filtro)
+            print('Año:', meses[1])
+            print('Mes', mes)
+            print('Dias', d[mes])
             aux = array_raster(ruta,filtro,meses[1],mes,d[mes], coord,producto)
             ArrayR.append(aux)
         return ArrayR,meses[0]

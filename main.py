@@ -48,7 +48,7 @@ coord = {
 Ncoord = cambio_coord (coord['coordinates'][0])
 poligono = project_wsg_shape_to_csr(Polygon(Ncoord), 'epsg:3857')
 fecha_inicial = '2021-11-1'
-fecha_final = '2021-12-30'
+fecha_final = '2022-12-30'
 PRODUCTO = 'L30'
 FILTRO = 'NDVI'
 bandera = True
@@ -93,13 +93,13 @@ def main(fechaI, fechaF, producto, filtro, coord, bandera):
 
 altos, medios, bajos, fechas, mesesInvalidos = main(fecha_inicial, fecha_final, PRODUCTO, FILTRO, poligono, bandera)
 print(mesesInvalidos)
-fig, ax = plt.subplots()
-ax.plot(fechas, altos, color = 'tab:purple', label = 'Altos')
-ax.plot(fechas, medios, color = 'tab:green', label = 'Medio')
-ax.plot(fechas, bajos, color = 'tab:red', label = 'Bajos')
-ax.set_ylim([-1,1])
-ax.legend(loc = 'upper right')
-ax.set_xlabel("Fechas")
-ax.set_ylabel("Valor")
-ax.grid()
-plt.show()
+#fig, ax = plt.subplots()
+#ax.plot(fechas, altos, color = 'tab:purple', label = 'Altos')
+#ax.plot(fechas, medios, color = 'tab:green', label = 'Medio')
+#ax.plot(fechas, bajos, color = 'tab:red', label = 'Bajos')
+#ax.set_ylim([-1,1])
+#ax.legend(loc = 'upper right')
+#ax.set_xlabel("Fechas")
+#ax.set_ylabel("Valor")
+#ax.grid()
+#plt.show()
